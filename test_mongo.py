@@ -27,6 +27,6 @@ print('---' * 20)
 # print all documents in the collection person
 for p in mycollection.find({}, {'_id': 0}):
     print(p.values())
-    #print(type(p))
+    # print(type(p))
 
 mydb.drop_collection('person')
