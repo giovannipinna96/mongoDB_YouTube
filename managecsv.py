@@ -42,10 +42,10 @@ def create_tags(data_video):
 
 def num_to_category(data_video, dict_category):
     for i in range(len(data_video.category_id)):
-        if str(data_video.category_id[i]) in dict_category:
-            data_video.category_id[i] = dict_category.get(str(data_video.category_id[i]))
+        if str(data_video.category_id.iloc[i]) in dict_category:
+            data_video.category_id.iloc[i] = dict_category.get(str(data_video.category_id.iloc[i]))
         else:
-            data_video.category_id[i] = None
+            data_video.category_id.iloc[i] = None
 
     return data_video
 
@@ -63,13 +63,15 @@ def calculate_mean_dislike(data_video):
         data_video.mean_dislike[data_video['channel_title'] == author] = data_video.mean_dislike[
             data_video['channel_title'] == author].fillna(
             round(data_video.dislikes[data_video['channel_title'] == author].mean()))
+    return data_video
 
 
 def calculate_mean_view(data_video):
     for author in data_video['channel_title']:
         data_video.mean_view[data_video['channel_title'] == author] = data_video.mean_view[
             data_video['channel_title'] == author].fillna(
-            round(data_video.viewa[data_video['channel_title'] == author].mean()))
+            round(data_video.views[data_video['channel_title'] == author].mean()))
+    return data_video
 
 
 def calculate_mean_comments(data_video):
@@ -77,13 +79,14 @@ def calculate_mean_comments(data_video):
         data_video.mean_comment[data_video['channel_title'] == author] = data_video.mean_comment[
             data_video['channel_title'] == author].fillna(
             round(data_video.comment_total[data_video['channel_title'] == author].mean()))
+    return data_video
 
 
 def create_analytics_col(data_video):
     data_video['mean_like'] = None
     data_video['mean_dislike'] = None
     data_video['mean_view'] = None
-    data_video['mean_comments'] = None
+    data_video['mean_comment'] = None
 
     return data_video
 
@@ -98,10 +101,14 @@ def get_elaborate_data(path_video: str = './trending_youtube_video_statistics_an
     data_video, data_comments, data_category = load_data(path_video, path_comments, path_category)
     data_comments = clean_comments(data_comments)
     dict_category = clean_category(data_category)
-    data_video = drop_duplicates_video(data_video)
+    data_video.drop_duplicates(subset=['video_id'], keep='last', inplace=True)
     data_tags = create_tags(data_video)
     data_video = create_analytics_col(data_video)
-    data_video = calculate_mean_comments(calculate_mean_view(calculate_mean_like(calculate_mean_dislike(data_video))))
+    data_video = calculate_mean_comments(data_video)
+    data_video = calculate_mean_view(data_video)
+    data_video = calculate_mean_like(data_video)
+    data_video = calculate_mean_dislike(data_video)
     data_video = num_to_category(data_video, dict_category)
+    data_video['tags'] = data_video.tags.apply(lambda x: x.split('|'))
 
-    return data_video, data_comments, data_category, data_tags
+    return data_video, data_comments, dict_category, data_tags
