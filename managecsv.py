@@ -28,6 +28,7 @@ def create_tags(data_video):
     tags.drop(['category_id', 'views', 'likes', 'dislikes', 'comment_total', 'thumbnail_link', 'date'], inplace=True,
               axis=1)
     tags.tags = tags.tags.apply(lambda x: x.split('|'))
+    tags = tags.drop_duplicates()
     d = {}
     for idx, ts in enumerate(tags['tags']):
         for t in ts:
