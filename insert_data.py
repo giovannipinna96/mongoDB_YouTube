@@ -12,6 +12,9 @@ def insert_video(data_video):
     for i in range(len(data_video)):
         mycollection.insert_one(data_video.iloc[i].to_dict())
 
+    mycollection.create_index(('video_id'), unique=True)
+    mycollection.create_index([('title', pm.TEXT), ('channel_title', pm.TEXT)])
+
 
 def insert_comment(dict_comments):
     mycollection = mydb['comment']
@@ -29,6 +32,8 @@ def insert_comment(dict_comments):
                             }
                  },
                 upsert=True)
+
+    mycollection.create_index([('video_id', 1), ('page', pm.ASCENDING)], unique=True)
 
 
 def insert_tags(tag: dict):
@@ -50,3 +55,5 @@ def insert_tags(tag: dict):
                             }
                  },
                 upsert=True)
+
+    mycollection.create_index([('tag', pm.TEXT)])
