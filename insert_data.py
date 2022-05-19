@@ -5,19 +5,21 @@ client = pm.MongoClient()
 # create db
 mydb = client['mydb_test']
 
-# create collection
-mycollection = mydb['person']
 
 
 def insert_video(data_video):
+    mycollection = mydb['video']
     for i in range(len(data_video)):
         mycollection.insert_one(data_video.iloc[i].to_dict())
 
 
 def insert_comment(dict_comments):
+    mycollection = mydb['comment']
     for k in dict_comments:
-        page = 0
+        page = 1
         for i, com in enumerate(dict_comments[k]):
+            if (i % 100) == 0 and i != 0:
+                page = page + 1
             mycollection.update_one(
                 {u'video_id': k,
                  u'page': page,
@@ -27,11 +29,10 @@ def insert_comment(dict_comments):
                             }
                  },
                 upsert=True)
-            if (i % 99) == 0:
-                page = page + 1
 
 
 def insert_tags(tag: dict):
+    mycollection = mydb['tag']
     for k in tag:
         temp_list = [tag[k][0], tag[k][1], tag[k][2]]
         mycollection.insert_one({

@@ -1,4 +1,5 @@
 import pandas as pd
+import math
 
 
 def load_data(path_video: str = './trending_youtube_video_statistics_and_comments/USvideos.csv',
@@ -27,8 +28,8 @@ def create_tags(data_video):
     tags = data_video.copy()
     tags.drop(['category_id', 'views', 'likes', 'dislikes', 'comment_total', 'thumbnail_link', 'date'], inplace=True,
               axis=1)
-    tags.tags = tags.tags.apply(lambda x: x.split('|'))
     tags = tags.drop_duplicates()
+    tags['tags'] = tags.tags.apply(lambda x: x.split('|'))
     d = {}
     for idx, ts in enumerate(tags['tags']):
         for t in ts:
@@ -111,5 +112,10 @@ def get_elaborate_data(path_video: str = './trending_youtube_video_statistics_an
     data_video = calculate_mean_dislike(data_video)
     data_video = num_to_category(data_video, dict_category)
     data_video['tags'] = data_video.tags.apply(lambda x: x.split('|'))
+    data_video['page_total'] = 0
+    data_video['page_total'] = data_video.comment_total.apply(lambda x: int(math.ceil(x / 100)))
+    data_comments['comment_and_likes'] = data_comments[['comment_text', 'likes']].values.tolist()
+    data_comments.drop(columns=['comment_text', 'likes'], inplace=True)
+    data_comments = data_comments.groupby('video_id').apply(lambda x: x.comment_and_likes.tolist())
 
     return data_video, data_comments, dict_category, data_tags
