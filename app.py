@@ -69,8 +69,25 @@ if task == 'Search':
     elif search == 'Channel name':
         channel_name = st.selectbox('Channel name',
                                     (ct['channel_title'] for ct in myvideo.find({}, {'_id': 0, 'channel_title': 1})))
-        for ch in myvideo.find({'channel_title': channel_name}):
-            pass
+        st.markdown(f'## Statistics for the channel: {channel_name}')
+        for ch in myvideo.aggregate([{'$match': {'channel_title': 'TMZ'}},
+                                     {'$group': {'_id': '$channel_title', 'tot_like': {'$sum': '$likes'},
+                                                 'tot_dislike': {'$sum': '$dislikes'},
+                                                 'tot_views': {'$sum': '$views'},
+                                                 'tot_comments': {'$sum': '$comment_total'}
+                                                 }}]):
+            tot_like = ch['tot_like']
+            tot_dislike = ch['tot_dislike']
+            tot_views = ch['tot_views']
+            tot_comments = ch['tot_comments']
+
+            a1, a2, a3, a4 = st.columns(4)
+            a1.metric("Total like", tot_like)
+            a2.metric("Total dislike", tot_dislike)
+            a3.metric("Total views", tot_views)
+            a4.metric("Total comments", tot_comments)
+
+
 
     else:
         tag = st.selectbox('Tag', (tg['tag'] for tg in mytag.find({}, {'_id': 0, 'tag': 1})))
