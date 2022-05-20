@@ -91,8 +91,23 @@ if task == 'Search':
 
     else:
         tag = st.selectbox('Tag', (tg['tag'] for tg in mytag.find({}, {'_id': 0, 'tag': 1})))
-        for tg in mytag.find({'tag': tag}, {'_id': 0, 'info_tag': 1}):
-            pass
+        st.markdown(f'## Statistics for the tag: {tag}')
+        for tg in myvideo.aggregate([{'$match': {'tags': tag}},
+                                         {'$group': {'_id': tag, 'tot_like': {'$sum': '$likes'},
+                                                     'tot_dislike': {'$sum': '$dislikes'},
+                                                     'tot_views': {'$sum': '$views'},
+                                                     'tot_comments': {'$sum': '$comment_total'}
+                                                     }}]):
+                tot_like = tg['tot_like']
+                tot_dislike = tg['tot_dislike']
+                tot_views = tg['tot_views']
+                tot_comments = tg['tot_comments']
+
+                a1, a2, a3, a4 = st.columns(4)
+                a1.metric("Total like", tot_like)
+                a2.metric("Total dislike", tot_dislike)
+                a3.metric("Total views", tot_views)
+                a4.metric("Total comments", tot_comments)
 
 
 else:
