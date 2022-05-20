@@ -118,4 +118,4 @@ def get_elaborate_data(path_video: str = './trending_youtube_video_statistics_an
     data_comments.drop(columns=['comment_text', 'likes'], inplace=True)
     data_comments = data_comments.groupby('video_id').apply(lambda x: x.comment_and_likes.tolist())
 
-    return data_video, data_comments, dict_category, data_tags
+    return data_video, data_comments.to_dict(), dict_category, data_tags

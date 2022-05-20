@@ -3,7 +3,7 @@ import pymongo as pm
 client = pm.MongoClient()
 
 # create db
-mydb = client['mydb_test']
+mydb = client['youtube']
 
 
 
