@@ -53,7 +53,7 @@ if task == 'Search':
             b3.metric("Views", views, f'{round(((views * 100) / views_mean) - 100)}%')
             b4.metric("Total comment", comment_tot, f'{round(((comment_tot * 100) / comment_tot_mean) - 100)}%')
 
-        col1, col2 = st.columns([3, 1])
+        col1, col2 = st.columns([4, 1])
         col1.markdown('## Comments:')
         for t in myvideo.find({'title': video_title}, {'_id': 0, 'page_total': 1, 'video_id': 1}):
             pages = t['page_total']
