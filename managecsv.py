@@ -1,5 +1,6 @@
-import pandas as pd
 import math
+
+import pandas as pd
 
 
 def load_data(path_video: str = './trending_youtube_video_statistics_and_comments/USvideos.csv',
@@ -112,11 +113,15 @@ def get_elaborate_data(path_video: str = './trending_youtube_video_statistics_an
     data_video = calculate_mean_dislike(data_video)
     data_video = num_to_category(data_video, dict_category)
     data_video['tags'] = data_video.tags.apply(lambda x: x.split('|'))
-    data_video['page_total'] = 0
-    for v in data_video['video_id']:
-        data_video.page_total[data_video['video_id'] == v] = int(math.ceil(len(data_comments[v]) / 100))
+    # data_video['page_total'] = data_video.comment_total.apply(lambda x: int(math.ceil(x / 100)))
     data_comments['comment_and_likes'] = data_comments[['comment_text', 'likes']].values.tolist()
     data_comments.drop(columns=['comment_text', 'likes'], inplace=True)
     data_comments = data_comments.groupby('video_id').apply(lambda x: x.comment_and_likes.tolist())
+    data_video['page_total'] = 0
+    for v in data_video['video_id']:
+        if v in data_comments.to_dict():
+            data_video.page_total[data_video['video_id'] == v] = int(math.ceil(len(data_comments[v]) / 100))
+        else:
+            data_video.page_total[data_video['video_id'] == v] = 0
 
-    return data_video, data_comments.to_dict(), dict_category, data_tags
+    return data_video, data_comments, dict_category, data_tags
